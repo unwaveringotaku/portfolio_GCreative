@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abhishek Tewari — AI Prompt Designer & Narrative Systems Thinker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   ROOT & RESET
+══════════════════════════════════════════ */
+:root {
+  --bg:       #080808;
+  --bg2:      #0d0d0d;
+  --bg3:      #111111;
+  --surface:  #161616;
+  --border:   #1e1e1e;
+  --border2:  #2a2a2a;
+  --fg:       #e8e4dc;
+  --fg2:      #a09a90;
+  --fg3:      #5a5550;
+  --red:      #e63329;
+  --teal:     #00c9be;
+  --teal2:    #00867e;
+  --gold:     #c9a84c;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ══════════════════════════════════════════
+   CUSTOM CURSOR
+══════════════════════════════════════════ */
+.cursor-dot {
+  width: 6px; height: 6px;
+  background: var(--teal);
+  border-radius: 50%;
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.05s, background 0.2s;
+}
+.cursor-ring {
+  width: 32px; height: 32px;
+  border: 1px solid rgba(0,201,190,0.35);
+  border-radius: 50%;
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: transform 0.15s ease, width 0.2s, height 0.2s, border-color 0.2s;
+}
+body:has(a:hover) .cursor-ring,
+body:has(button:hover) .cursor-ring {
+  width: 48px; height: 48px;
+  border-color: var(--teal);
+}
+
+/* ══════════════════════════════════════════
+   GRAIN OVERLAY
+══════════════════════════════════════════ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.028;
+  pointer-events: none;
+  z-index: 9997;
+}
+
+/* ══════════════════════════════════════════
+   NAV
+══════════════════════════════════════════ */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 52px;
+  background: linear-gradient(to bottom, rgba(8,8,8,0.95) 0%, transparent 100%);
+  backdrop-filter: blur(0px);
+  transition: background 0.4s, backdrop-filter 0.4s, padding 0.3s;
+}
+nav.scrolled {
+  background: rgba(8,8,8,0.94);
+  backdrop-filter: blur(20px);
+  padding: 16px 52px;
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--teal);
+  letter-spacing: 0.06em;
+  text-decoration: none;
+}
+.nav-links {
+  display: flex;
+  gap: 40px;
+  list-style: none;
+}
+.nav-links a {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg2);
+  text-decoration: none;
+  transition: color 0.2s;
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -3px; left: 0;
+  width: 0; height: 1px;
+  background: var(--teal);
+  transition: width 0.3s;
+}
+.nav-links a:hover { color: var(--fg); }
+.nav-links a:hover::after { width: 100%; }
+.nav-cta {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--teal);
+  padding: 9px 22px;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.2s;
+}
+.nav-cta:hover { background: var(--fg); transform: translateY(-1px); }
+
+/* ══════════════════════════════════════════
+   HERO
+══════════════════════════════════════════ */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 52px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.hero-bg-lines::before {
+  content: '';
+  position: absolute;
+  top: -20%; left: 55%;
+  width: 1px; height: 140%;
+  background: linear-gradient(to bottom, transparent, var(--border2) 30%, var(--border2) 70%, transparent);
+  transform: rotate(-8deg);
+}
+.hero-bg-lines::after {
+  content: '';
+  position: absolute;
+  top: -20%; left: 70%;
+  width: 1px; height: 140%;
+  background: linear-gradient(to bottom, transparent, var(--border) 30%, var(--border) 70%, transparent);
+  transform: rotate(-8deg);
+}
+
+.hero-counter {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--red);
+  text-transform: uppercase;
+  margin-bottom: 32px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.2s forwards;
+}
+
+.hero-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(68px, 10vw, 148px);
+  font-weight: 300;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  margin-bottom: 0;
+  opacity: 0;
+  animation: fadeUp 1s 0.4s forwards;
+}
+.hero-name em {
+  display: block;
+  font-style: italic;
+  color: var(--teal);
+}
+
+.hero-tagline {
+  margin-top: 40px;
+  display: flex;
+  align-items: flex-start;
+  gap: 60px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.8s forwards;
+}
+.hero-tagline-main {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--fg2);
+  max-width: 420px;
+  line-height: 1.65;
+}
+.hero-tagline-main strong { color: var(--fg); font-weight: 600; }
+.hero-tagline-stats {
+  display: flex;
+  gap: 48px;
+  padding-top: 4px;
+}
+.hero-stat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 300;
+  color: var(--fg);
+  line-height: 1;
+}
+.hero-stat-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  margin-top: 6px;
+}
+
+.hero-scroll {
+  position: absolute;
+  right: 52px;
+  bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  animation: fadeIn 1s 1.4s forwards;
+}
+.hero-scroll span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  writing-mode: vertical-rl;
+}
+.hero-scroll-line {
+  width: 1px; height: 60px;
+  background: linear-gradient(to bottom, var(--teal), transparent);
+  animation: scrollPulse 2s infinite;
+}
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50% { opacity: 1; transform: scaleY(1.2); }
+}
+
+.hero-teal-bar {
+  position: absolute;
+  left: 0; top: 30%; bottom: 30%;
+  width: 3px;
+  background: linear-gradient(to bottom, transparent, var(--teal), transparent);
+  opacity: 0;
+  animation: fadeIn 1s 1s forwards;
+}
+
+/* ══════════════════════════════════════════
+   SECTION SHARED
+══════════════════════════════════════════ */
+section {
+  padding: 120px 52px;
+  position: relative;
+}
+section + section {
+  border-top: 1px solid var(--border);
+}
+
+.section-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.section-eyebrow-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--teal);
+  letter-spacing: 0.14em;
+}
+.section-eyebrow-line {
+  width: 40px; height: 1px;
+  background: var(--teal2);
+}
+.section-eyebrow-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg3);
+}
+
+.section-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(38px, 5vw, 62px);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 56px;
+}
+.section-heading em { font-style: italic; color: var(--teal); }
+
+/* Reveal animation */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+
+/* ══════════════════════════════════════════
+   ABOUT
+══════════════════════════════════════════ */
+#about {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+.about-left {}
+.about-right {}
+
+.about-statement {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--fg);
+  margin-bottom: 32px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border2);
+}
+.about-statement strong { color: var(--teal); font-weight: 400; font-style: italic; }
+
+.about-body {
+  font-size: 14.5px;
+  color: var(--fg2);
+  line-height: 1.8;
+}
+.about-body p + p { margin-top: 16px; }
+.about-body strong { color: var(--fg); font-weight: 600; }
+.about-body em { color: var(--teal); font-style: normal; }
+
+.about-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.about-meta-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+.about-meta-key {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg3);
+}
+.about-meta-val {
+  font-size: 13.5px;
+  color: var(--fg2);
+  text-align: right;
+}
+.about-meta-val strong { color: var(--fg); }
+
+.availability-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0,201,190,0.07);
+  border: 1px solid rgba(0,201,190,0.2);
+  padding: 10px 18px;
+  margin-top: 32px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--teal);
+}
+.availability-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--teal);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* ══════════════════════════════════════════
+   SKILLS
+══════════════════════════════════════════ */
+#skills {
+  background: var(--bg2);
+}
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.skill-card {
+  background: var(--bg2);
+  padding: 36px 32px;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s;
+}
+.skill-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 2px;
+  background: var(--teal);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s;
+}
+.skill-card:hover { background: var(--surface); }
+.skill-card:hover::before { transform: scaleX(1); }
+
+.skill-card-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--fg3);
+  letter-spacing: 0.14em;
+  margin-bottom: 20px;
+}
+.skill-card-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--fg);
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+.skill-card-desc {
+  font-size: 13px;
+  color: var(--fg2);
+  line-height: 1.65;
+}
+.skill-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 20px;
+}
+.skill-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  color: var(--teal2);
+  background: rgba(0,134,126,0.1);
+  border: 1px solid rgba(0,134,126,0.2);
+  padding: 3px 9px;
+}
+
+/* ══════════════════════════════════════════
+   WORK / EXPERIENCE
+══════════════════════════════════════════ */
+#experience {}
+.exp-timeline {
+  position: relative;
+  padding-left: 32px;
+}
+.exp-timeline::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 8px; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--teal), var(--border) 80%, transparent);
+}
+.exp-item {
+  position: relative;
+  padding-bottom: 60px;
+}
+.exp-item:last-child { padding-bottom: 0; }
+.exp-item::before {
+  content: '';
+  position: absolute;
+  left: -36px; top: 8px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--teal);
+  transition: background 0.3s, border-width 0.3s;
+}
+.exp-item:hover::before {
+  background: var(--teal);
+}
+
+.exp-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.exp-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--teal);
+  background: rgba(0,201,190,0.07);
+  border: 1px solid rgba(0,201,190,0.15);
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+.exp-company {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg3);
+}
+.exp-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--fg);
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+.exp-desc {
+  font-size: 14px;
+  color: var(--fg2);
+  line-height: 1.75;
+  max-width: 680px;
+  margin-bottom: 16px;
+}
+.exp-bullets {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 680px;
+}
+.exp-bullets li {
+  font-size: 13.5px;
+  color: var(--fg2);
+  padding-left: 20px;
+  position: relative;
+  line-height: 1.6;
+}
+.exp-bullets li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--red);
+  font-size: 11px;
+  top: 2px;
+}
+.exp-bullets li strong { color: var(--fg); font-weight: 600; }
+
+/* ══════════════════════════════════════════
+   PROJECTS
+══════════════════════════════════════════ */
+#projects {
+  background: var(--bg2);
+}
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+  background: var(--border);
+}
+.project-card {
+  background: var(--bg2);
+  padding: 48px 44px;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s;
+  cursor: pointer;
+}
+.project-card:hover { background: var(--surface); }
+
+.project-card-accent {
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: var(--teal);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
+}
+.project-card:hover .project-card-accent { transform: scaleY(1); }
+
+.project-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--fg3);
+  margin-bottom: 24px;
+}
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.project-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--red);
+  background: rgba(230,51,41,0.07);
+  border: 1px solid rgba(230,51,41,0.15);
+  padding: 3px 9px;
+}
+.project-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 34px;
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+  margin-bottom: 8px;
+}
+.project-subtitle {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 20px;
+}
+.project-desc {
+  font-size: 13.5px;
+  color: var(--fg2);
+  line-height: 1.75;
+  margin-bottom: 24px;
+}
+.project-role {
+  font-size: 12px;
+  color: var(--fg3);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.06em;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.project-role strong { color: var(--teal); }
+
+.project-impact {
+  display: flex;
+  gap: 32px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.impact-item {}
+.impact-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--fg);
+  line-height: 1;
+}
+.impact-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  margin-top: 4px;
+}
+
+/* ══════════════════════════════════════════
+   PROMPT CASE STUDY
+══════════════════════════════════════════ */
+#prompt-work {}
+
+.prompt-intro {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  margin-bottom: 80px;
+}
+.prompt-intro-text {
+  font-size: 14.5px;
+  color: var(--fg2);
+  line-height: 1.8;
+}
+.prompt-intro-text p + p { margin-top: 16px; }
+.prompt-intro-text strong { color: var(--fg); }
+.prompt-intro-text em { color: var(--teal); font-style: normal; }
+
+.prompt-principle-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.prompt-principle {
+  display: flex;
+  gap: 20px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: flex-start;
+}
+.prompt-principle:first-child { border-top: 1px solid var(--border); }
+.principle-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--teal);
+  letter-spacing: 0.14em;
+  padding-top: 3px;
+  flex-shrink: 0;
+}
+.principle-text { font-size: 13.5px; color: var(--fg2); line-height: 1.65; }
+.principle-text strong { color: var(--fg); }
+
+/* Prompt comparison */
+.prompt-case {
+  margin-bottom: 64px;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  overflow: hidden;
+}
+.prompt-case-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 32px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.prompt-case-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--fg);
+  letter-spacing: -0.01em;
+}
+.prompt-case-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg3);
+}
+.prompt-case-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.prompt-col {
+  padding: 28px 32px;
+}
+.prompt-col + .prompt-col {
+  border-left: 1px solid var(--border);
+}
+.prompt-col-header {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.prompt-col-header.v1 { color: #e05050; }
+.prompt-col-header.v2 { color: var(--teal); }
+.prompt-col-header.insight { color: #b07fff; }
+.prompt-col-header.output { color: #7a9fff; }
+
+.prompt-text-block {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.75;
+  color: var(--fg2);
+  white-space: pre-wrap;
+}
+.prompt-text-block.v1 { color: #e09090; }
+.prompt-text-block.v2 { color: #90e8e4; }
+.prompt-text-block.output { color: #9ab0ff; }
+.prompt-text-block.insight { color: #ccaaff; font-family: 'Syne', sans-serif; font-size: 13px; }
+
+.prompt-improvements {
+  padding: 16px 32px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.prompt-improve-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  margin-right: 4px;
+}
+.improve-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  color: var(--teal);
+  background: rgba(0,201,190,0.07);
+  border: 1px solid rgba(0,201,190,0.18);
+  padding: 3px 10px;
+}
+
+/* ══════════════════════════════════════════
+   EDUCATION
+══════════════════════════════════════════ */
+#education {
+  background: var(--bg2);
+}
+.edu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.edu-item {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 48px;
+  padding: 40px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: start;
+}
+.edu-item:first-child { border-top: 1px solid var(--border); }
+.edu-year {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 42px;
+  font-weight: 300;
+  color: var(--fg3);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  padding-top: 4px;
+}
+.edu-school {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--fg);
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+.edu-degree {
+  font-size: 13.5px;
+  color: var(--teal);
+  margin-bottom: 4px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.edu-detail {
+  font-size: 13px;
+  color: var(--fg2);
+  line-height: 1.6;
+}
+.edu-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  background: rgba(201,168,76,0.08);
+  border: 1px solid rgba(201,168,76,0.2);
+  padding: 4px 12px;
+  margin-top: 12px;
+  display: inline-flex;
+}
+
+/* ══════════════════════════════════════════
+   CONTACT
+══════════════════════════════════════════ */
+#contact {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+#contact::before {
+  content: 'OPEN';
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%) rotate(90deg);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 160px;
+  font-weight: 300;
+  color: var(--border);
+  letter-spacing: -0.05em;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.contact-big {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(40px, 6vw, 80px);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+  margin-bottom: 48px;
+  max-width: 700px;
+}
+.contact-big em { font-style: italic; color: var(--teal); }
+
+.contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 60px;
+}
+.contact-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--fg2);
+  text-decoration: none;
+  padding: 14px 24px;
+  border: 1px solid var(--border2);
+  transition: color 0.2s, border-color 0.2s, transform 0.2s;
+}
+.contact-link:hover {
+  color: var(--teal);
+  border-color: var(--teal2);
+  transform: translateY(-2px);
+}
+.contact-link-icon { color: var(--teal); font-size: 14px; }
+
+.contact-locations {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.location-item {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.location-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--teal);
+}
+
+/* ══════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════ */
+footer {
+  padding: 32px 52px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.footer-copy {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--fg3);
+}
+.footer-back {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-back:hover { color: var(--teal); }
+
+/* ══════════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media (max-width: 900px) {
+  nav { padding: 20px 28px; }
+  nav.scrolled { padding: 14px 28px; }
+  .nav-links { display: none; }
+  section { padding: 80px 28px; }
+  #hero { padding: 0 28px 64px; }
+  #about { grid-template-columns: 1fr; gap: 48px; }
+  .skills-grid { grid-template-columns: 1fr 1fr; }
+  .projects-grid { grid-template-columns: 1fr; }
+  .prompt-intro { grid-template-columns: 1fr; gap: 40px; }
+  .prompt-case-body { grid-template-columns: 1fr; }
+  .prompt-col + .prompt-col { border-left: none; border-top: 1px solid var(--border); }
+  .edu-item { grid-template-columns: 1fr; gap: 12px; }
+  footer { flex-direction: column; gap: 12px; text-align: center; }
+  .hero-tagline { flex-direction: column; gap: 32px; }
+  .hero-scroll { display: none; }
+  #contact::before { display: none; }
+}
+@media (max-width: 600px) {
+  .skills-grid { grid-template-columns: 1fr; }
+  .contact-links { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- ════════════ NAV ════════════ -->
+<nav id="mainNav">
+  <a href="#hero" class="nav-logo">AT — 2025</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#prompt-work">Prompt Work</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="mailto:abhishektewari71@gmail.com" class="nav-cta">Get in Touch</a>
+</nav>
+
+<!-- ════════════ HERO ════════════ -->
+<section id="hero">
+  <div class="hero-teal-bar"></div>
+  <div class="hero-bg-lines"></div>
+
+  <div class="hero-counter">Abhishek Tewari &nbsp;/&nbsp; Portfolio 2025</div>
+
+  <h1 class="hero-name">
+    AI Prompt<br>
+    Designer &amp;<br>
+    <em>Narrative Systems</em><br>
+    Thinker.
+  </h1>
+
+  <div class="hero-tagline">
+    <p class="hero-tagline-main">
+      I design the instructions that teach AI what to create —<br>
+      <strong>and then I evaluate whether it did.</strong><br><br>
+      5 years building AI systems at Accenture. Graduate of Parsons School of Design. NASA studio partner.
+    </p>
+    <div class="hero-tagline-stats">
+      <div>
+        <div class="hero-stat-num">5+</div>
+        <div class="hero-stat-label">Years in AI</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">4.0</div>
+        <div class="hero-stat-label">GPA — Parsons</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">100K+</div>
+        <div class="hero-stat-label">AI Outputs Evaluated</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- ════════════ ABOUT ════════════ -->
+<section id="about">
+  <div class="about-left reveal">
+    <div class="section-eyebrow">
+      <span class="section-eyebrow-num">01</span>
+      <div class="section-eyebrow-line"></div>
+      <span class="section-eyebrow-label">About</span>
+    </div>
+    <h2 class="section-heading">Who I<br><em>Actually</em> Am</h2>
+
+    <p class="about-statement">
+      I spent <strong>five years inside AI systems</strong> before I started designing with them.
+    </p>
+
+    <div class="about-body">
+      <p>At Accenture, I worked on human-in-the-loop AI programs for Fortune 10 clients — evaluating datasets, diagnosing annotation failures, and building the quality standards that shaped what machine learning models learned. That work taught me something most designers don't know firsthand: <strong>AI output quality is almost entirely determined by the clarity and structure of the instructions it receives.</strong></p>
+      <p>I'm now completing an MS in Strategic Design &amp; Management at Parsons (4.0 GPA), where I've applied that operational fluency to narrative and creative systems. I've designed a speculative governance game with NASA, built a post-labor economic framework as a thesis project, and used AI co-creation tools not as shortcuts — but as <em>systems to direct and refine</em>.</p>
+      <p>What I do is precise: I write prompts the way I used to write annotation guidelines — with explicit intent, clear constraints, and a built-in evaluation loop. I test what comes out. I revise what doesn't work. I document why.</p>
+    </div>
+
+    <div class="availability-badge">
+      <div class="availability-dot"></div>
+      Open to full-time roles — NYC, Amsterdam, London
+    </div>
+  </div>
+
+  <div class="about-right reveal reveal-delay-2">
+    <div class="about-meta">
+      <div class="about-meta-item">
+        <span class="about-meta-key">Role</span>
+        <span class="about-meta-val"><strong>AI Prompt Designer &amp; Narrative Strategist</strong></span>
+      </div>
+      <div class="about-meta-item">
+        <span class="about-meta-key">Education</span>
+        <span class="about-meta-val">MS Strategic Design — <strong>Parsons</strong></span>
+      </div>
+      <div class="about-meta-item">
+        <span class="about-meta-key">GPA</span>
+        <span class="about-meta-val"><strong>4.0 / 4.0</strong></span>
+      </div>
+      <div class="about-meta-item">
+        <span class="about-meta-key">Prior</span>
+        <span class="about-meta-val">5 years — <strong>Accenture AI Ops</strong></span>
+      </div>
+      <div class="about-meta-item">
+        <span class="about-meta-key">Focus Areas</span>
+        <span class="about-meta-val">Prompt Design · Narrative Systems · Foresight</span>
+      </div>
+      <div class="about-meta-item">
+        <span class="about-meta-key">AI Tools</span>
+        <span class="about-meta-val">GPT-4 · Midjourney · Framer · Firebase</span>
+      </div>
+      <div class="about-meta-item">
+        <span class="about-meta-key">Design Tools</span>
+        <span class="about-meta-val">Figma · Miro · Notion · Tableau</span>
+      </div>
+      <div class="about-meta-item">
+        <span class="about-meta-key">Location</span>
+        <span class="about-meta-val"><strong>New York, NY</strong></span>
+      </div>
+      <div class="about-meta-item">
+        <span class="about-meta-key">Email</span>
+        <span class="about-meta-val"><a href="mailto:abhishektewari71@gmail.com" style="color:var(--teal); text-decoration:none;">abhishektewari71@gmail.com</a></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ SKILLS ════════════ -->
+<section id="skills">
+  <div class="section-eyebrow reveal">
+    <span class="section-eyebrow-num">02</span>
+    <div class="section-eyebrow-line"></div>
+    <span class="section-eyebrow-label">Skills</span>
+  </div>
+  <h2 class="section-heading reveal">What I<br><em>Bring</em></h2>
+
+  <div class="skills-grid">
+    <div class="skill-card reveal reveal-delay-1">
+      <div class="skill-card-num">01</div>
+      <div class="skill-card-name">Prompt Structuring &amp; Iteration</div>
+      <div class="skill-card-desc">Designing prompts with explicit role, constraint, format, and tone specifications. Running structured A/B iteration loops to improve output quality and consistency across generations.</div>
+      <div class="skill-card-tags">
+        <span class="skill-tag">Role context</span>
+        <span class="skill-tag">Constraint design</span>
+        <span class="skill-tag">Output evaluation</span>
+      </div>
+    </div>
+
+    <div class="skill-card reveal reveal-delay-2">
+      <div class="skill-card-num">02</div>
+      <div class="skill-card-name">AI Output Evaluation</div>
+      <div class="skill-card-desc">Assessing AI-generated content against defined quality benchmarks. Diagnosing failure modes — hallucination, tone drift, structural inconsistency — and redesigning prompts to correct them.</div>
+      <div class="skill-card-tags">
+        <span class="skill-tag">Quality rubrics</span>
+        <span class="skill-tag">Error taxonomy</span>
+        <span class="skill-tag">Iteration docs</span>
+      </div>
+    </div>
+
+    <div class="skill-card reveal reveal-delay-3">
+      <div class="skill-card-num">03</div>
+      <div class="skill-card-name">Narrative System Design</div>
+      <div class="skill-card-desc">Building fictional worlds with internal logic: factions, rule sets, temporal arcs, and constraint systems that make AI-generated story content coherent and controlled at scale.</div>
+      <div class="skill-card-tags">
+        <span class="skill-tag">World-building</span>
+        <span class="skill-tag">Faction design</span>
+        <span class="skill-tag">Story systems</span>
+      </div>
+    </div>
+
+    <div class="skill-card reveal reveal-delay-1">
+      <div class="skill-card-num">04</div>
+      <div class="skill-card-name">Human-in-the-Loop AI Fluency</div>
+      <div class="skill-card-desc">Deep operational experience in AI data pipelines — annotation standards, evaluation frameworks, quality control, and documentation that directly shapes what models learn and produce.</div>
+      <div class="skill-card-tags">
+        <span class="skill-tag">Dataset QA</span>
+        <span class="skill-tag">Annotation design</span>
+        <span class="skill-tag">HITL systems</span>
+      </div>
+    </div>
+
+    <div class="skill-card reveal reveal-delay-2">
+      <div class="skill-card-num">05</div>
+      <div class="skill-card-name">Strategic Foresight &amp; Scenario Design</div>
+      <div class="skill-card-desc">Constructing plausible futures using structured research, systems mapping, and speculative economic modeling. Applied across policy, product, and AI governance contexts at Parsons.</div>
+      <div class="skill-card-tags">
+        <span class="skill-tag">Systems mapping</span>
+        <span class="skill-tag">Policy foresight</span>
+        <span class="skill-tag">Scenario design</span>
+      </div>
+    </div>
+
+    <div class="skill-card reveal reveal-delay-3">
+      <div class="skill-card-num">06</div>
+      <div class="skill-card-name">Cross-Disciplinary Storytelling</div>
+      <div class="skill-card-desc">Translating complex technical systems into compelling narratives for non-specialist audiences. Experience presenting speculative work to NASA directors, Parsons faculty, and enterprise stakeholders.</div>
+      <div class="skill-card-tags">
+        <span class="skill-tag">Presentation design</span>
+        <span class="skill-tag">Brand narrative</span>
+        <span class="skill-tag">AI co-creation</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ EXPERIENCE ════════════ -->
+<section id="experience">
+  <div class="section-eyebrow reveal">
+    <span class="section-eyebrow-num">03</span>
+    <div class="section-eyebrow-line"></div>
+    <span class="section-eyebrow-label">Experience</span>
+  </div>
+  <h2 class="section-heading reveal">Where I've<br><em>Done the Work</em></h2>
+
+  <div class="exp-timeline">
+
+    <div class="exp-item reveal">
+      <div class="exp-meta">
+        <span class="exp-date">2024 — Present</span>
+        <span class="exp-company">Parsons School of Design</span>
+      </div>
+      <div class="exp-title">MS Strategic Design &amp; Management</div>
+      <div class="exp-desc">Graduate researcher applying systems thinking, strategic foresight, and AI-driven narrative design to real-world problems in governance, sustainability, and organizational transformation.</div>
+      <ul class="exp-bullets">
+        <li><strong>4.0 GPA</strong> — Minor in Impact Entrepreneurship</li>
+        <li>Partnered with <strong>NASA</strong> on Y.E.E.T., a speculative game addressing orbital debris governance</li>
+        <li>Thesis project "Extra Omnes" — post-labor economic framework using AI prototyping and speculative foresight</li>
+        <li>GreenCatalyst — mobile-first sustainability tool; recognized at Parsons studio showcase for inclusive design</li>
+      </ul>
+    </div>
+
+    <div class="exp-item reveal reveal-delay-1">
+      <div class="exp-meta">
+        <span class="exp-date">Aug — Dec 2025</span>
+        <span class="exp-company">Waiting Room Publishing · Seattle, WA</span>
+      </div>
+      <div class="exp-title">Marketing &amp; Communications Intern</div>
+      <div class="exp-desc">Built the company's first end-to-end marketing infrastructure from the ground up — including segmentation models, CRM architecture, outreach workflows, and lifecycle automation.</div>
+      <ul class="exp-bullets">
+        <li>Designed <strong>Ideal Customer Profile framework</strong> across Healthcare, Seniors, and End-of-Life verticals</li>
+        <li>Implemented lifecycle email automation achieving <strong>open rates of 30–60%</strong> and CTR up to ~20%</li>
+        <li>Created documentation and operational playbooks ensuring continuity beyond the internship</li>
+      </ul>
+    </div>
+
+    <div class="exp-item reveal reveal-delay-1">
+      <div class="exp-meta">
+        <span class="exp-date">Jun 2023 — Jul 2024</span>
+        <span class="exp-company">Accenture · Gurgaon, India</span>
+      </div>
+      <div class="exp-title">Delivery Excellence Lead — AI Data Operations</div>
+      <div class="exp-desc">Led delivery excellence for an AI data operations program, managing a 10-member team responsible for evaluation and quality assurance of machine learning training datasets.</div>
+      <ul class="exp-bullets">
+        <li>Rebuilt annotation guidelines after diagnosing a recurring error pattern — <strong>lifted project quality from 90% to 98%</strong> within 3 months, sustained across the team</li>
+        <li>Built and maintained <strong>Tableau dashboards</strong> tracking productivity, quality metrics, and SLA performance used by leadership</li>
+        <li>Coordinated cross-functional communication between operations, HR, and technical support teams</li>
+        <li>Conducted candidate screening and interviews in partnership with HR for new team hires</li>
+      </ul>
+    </div>
+
+    <div class="exp-item reveal reveal-delay-1">
+      <div class="exp-meta">
+        <span class="exp-date">Apr 2021 — Jun 2023</span>
+        <span class="exp-company">Accenture · Gurgaon, India</span>
+      </div>
+      <div class="exp-title">Trust &amp; Safety Associate / Quality Auditor</div>
+      <div class="exp-desc">Supervised a 19-member team evaluating handwriting datasets used to train stylus-based AI recognition systems. Led quality auditing across 15+ data evaluation projects.</div>
+      <ul class="exp-bullets">
+        <li>Ensured accuracy of letter detection models by reviewing outsourced annotation outputs and enforcing quality benchmarks</li>
+        <li>Identified recurring data errors and recommended improvements to annotation guidelines and auditing procedures</li>
+        <li><strong>Designed and led onboarding training</strong> for newly hired analysts from 2021 onward — built team capability in AI evaluation, quality auditing, and annotation standards</li>
+      </ul>
+    </div>
+
+    <div class="exp-item reveal reveal-delay-1">
+      <div class="exp-meta">
+        <span class="exp-date">Aug 2019 — Apr 2021</span>
+        <span class="exp-company">Accenture · Gurgaon, India</span>
+      </div>
+      <div class="exp-title">Data Associate — AI Dataset Pilot Program</div>
+      <div class="exp-desc">Selected for a pilot team supporting a Fortune 10 technology client developing computer vision training datasets.</div>
+      <ul class="exp-bullets">
+        <li>Contributed to the creation and validation of <strong>100,000+ annotated images</strong> used to train object recognition models</li>
+        <li>Ensured labeling accuracy and dataset consistency to support reliable AI outputs</li>
+        <li>Foundational experience at the dataset level — understanding AI capability from its source, not its interface</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════ PROJECTS ════════════ -->
+<section id="projects">
+  <div class="section-eyebrow reveal">
+    <span class="section-eyebrow-num">04</span>
+    <div class="section-eyebrow-line"></div>
+    <span class="section-eyebrow-label">Projects</span>
+  </div>
+  <h2 class="section-heading reveal">Selected<br><em>Work</em></h2>
+
+  <div class="projects-grid">
+
+    <div class="project-card reveal">
+      <div class="project-card-accent"></div>
+      <div class="project-num">01 / 04</div>
+      <div class="project-tags">
+        <span class="project-tag">Game Design</span>
+        <span class="project-tag">Space Governance</span>
+        <span class="project-tag">AI Narrative</span>
+      </div>
+      <div class="project-name">NASA × Y.E.E.T.</div>
+      <div class="project-subtitle">A Game About Cleaning Space. And Rethinking It.</div>
+      <div class="project-desc">Partnered with NASA through a Parsons studio to design Y.E.E.T. — a foresight-based game addressing orbital debris. Merged real space science with gameplay to raise awareness about sustainability in Low Earth Orbit. Led narrative design, faction world-building, and AI-assisted speculative foresight modeling.</div>
+      <div class="project-impact">
+        <div class="impact-item">
+          <div class="impact-num">8</div>
+          <div class="impact-label">Expert Interviews</div>
+        </div>
+        <div class="impact-item">
+          <div class="impact-num">3</div>
+          <div class="impact-label">Faction Scenarios</div>
+        </div>
+        <div class="impact-item">
+          <div class="impact-num">NASA</div>
+          <div class="impact-label">ISS Directors Presentation</div>
+        </div>
+      </div>
+      <div class="project-role"><strong>Role:</strong> Design Strategist — narrative design, faction world-building, speculative foresight modeling, AI prompt system design</div>
+    </div>
+
+    <div class="project-card reveal reveal-delay-2">
+      <div class="project-card-accent"></div>
+      <div class="project-num">02 / 04</div>
+      <div class="project-tags">
+        <span class="project-tag">Speculative Foresight</span>
+        <span class="project-tag">Policy Design</span>
+        <span class="project-tag">Ethical AI</span>
+      </div>
+      <div class="project-name">Extra Omnes</div>
+      <div class="project-subtitle">A Future Without Labor. And the Economy That Follows.</div>
+      <div class="project-desc">Thesis project for the Parsons "New Economies" Seminar. Explores a speculative future where AI and robots perform all labor. Proposes frameworks like a Robot Labor Tax, Universal Basic Income, and Time-as-Currency to enable human flourishing beyond employment. Used AI prototyping to generate and test narrative outputs across 4 future scenarios.</div>
+      <div class="project-impact">
+        <div class="impact-item">
+          <div class="impact-num">15</div>
+          <div class="impact-label">Economic Models</div>
+        </div>
+        <div class="impact-item">
+          <div class="impact-num">4</div>
+          <div class="impact-label">Future Scenarios</div>
+        </div>
+        <div class="impact-item">
+          <div class="impact-num">30pg</div>
+          <div class="impact-label">Research Report</div>
+        </div>
+      </div>
+      <div class="project-role"><strong>Role:</strong> Independent researcher — economic models, policy proposals, AI-assisted narrative prototyping, interactive time-as-currency interface</div>
+    </div>
+
+    <div class="project-card reveal reveal-delay-1">
+      <div class="project-card-accent"></div>
+      <div class="project-num">03 / 04</div>
+      <div class="project-tags">
+        <span class="project-tag">Sustainable Tech</span>
+        <span class="project-tag">UX Research</span>
+        <span class="project-tag">Social Impact</span>
+      </div>
+      <div class="project-name">GreenCatalyst</div>
+      <div class="project-subtitle">A Digital Sustainability Assistant for the Underserved.</div>
+      <div class="project-desc">Mobile-first digital tool helping homeowners and small developers integrate sustainability into construction projects — even on tight budgets. Prioritized accessible language and step-by-step eco-guidance. Interviewed demographics across all 5 NYC boroughs; 78% cited cost and complexity as primary barriers.</div>
+      <div class="project-impact">
+        <div class="impact-item">
+          <div class="impact-num">78%</div>
+          <div class="impact-label">Cited Cost Barrier</div>
+        </div>
+        <div class="impact-item">
+          <div class="impact-num">5</div>
+          <div class="impact-label">NYC Boroughs</div>
+        </div>
+      </div>
+      <div class="project-role"><strong>Role:</strong> Founder &amp; Lead UX — user interviews, challenge mapping, low-fidelity wireframes, AI prototyping</div>
+    </div>
+
+    <div class="project-card reveal reveal-delay-3">
+      <div class="project-card-accent"></div>
+      <div class="project-num">04 / 04</div>
+      <div class="project-tags">
+        <span class="project-tag">Product Innovation</span>
+        <span class="project-tag">UX Strategy</span>
+        <span class="project-tag">Behavioral Design</span>
+      </div>
+      <div class="project-name">Cometeer Family UX</div>
+      <div class="project-subtitle">Making Coffee Gifting Feel Like Gifting Again.</div>
+      <div class="project-desc">Created a new family-focused subscription model to help Cometeer expand its user base. Used personas, journey flows, and competitive benchmarking to define friction points and improve retention. Analyzed 150+ customer reviews, interviewed 6 family units, benchmarked 8 subscription competitors.</div>
+      <div class="project-impact">
+        <div class="impact-item">
+          <div class="impact-num">87%</div>
+          <div class="impact-label">Intent to Subscribe</div>
+        </div>
+        <div class="impact-item">
+          <div class="impact-num">20%</div>
+          <div class="impact-label">Projected Retention Lift</div>
+        </div>
+      </div>
+      <div class="project-role"><strong>Role:</strong> UX Strategist — design sprint facilitation, user emotion mapping, Figma prototype with loyalty nudges</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════ PROMPT WORK ════════════ -->
+<section id="prompt-work">
+  <div class="section-eyebrow reveal">
+    <span class="section-eyebrow-num">05</span>
+    <div class="section-eyebrow-line"></div>
+    <span class="section-eyebrow-label">Prompt Design</span>
+  </div>
+  <h2 class="section-heading reveal">How I<br><em>Prompt</em></h2>
+
+  <div class="prompt-intro">
+    <div class="prompt-intro-text reveal">
+      <p>My approach to prompt engineering comes directly from annotation guideline writing — both are exercises in <strong>specifying intent precisely enough that a system can act on it without ambiguity</strong>.</p>
+      <p>At Accenture, I learned that quality failures in AI outputs almost always trace back to under-specified instructions. A prompt is no different from an annotation standard: <em>explicit exclusion criteria reduce ambiguity more effectively than positive descriptions alone.</em></p>
+      <p>The case studies below document real iteration loops — what failed, what changed, and why the refined output worked better.</p>
+    </div>
+
+    <ul class="prompt-principle-list reveal reveal-delay-2">
+      <li class="prompt-principle">
+        <span class="principle-num">01</span>
+        <div class="principle-text"><strong>Context anchoring</strong> — embedding prompts inside a named framework tells the model it's operating within defined rules, not generating freely.</div>
+      </li>
+      <li class="prompt-principle">
+        <span class="principle-num">02</span>
+        <div class="principle-text"><strong>Constraint as direction</strong> — "avoid X" is a more precise instruction than "be Y." Exclusion criteria sharpen outputs faster than positive descriptions.</div>
+      </li>
+      <li class="prompt-principle">
+        <span class="principle-num">03</span>
+        <div class="principle-text"><strong>Character specificity creates systemic specificity</strong> — defining a narrator's concrete history forces the model to generate a specific world, not a generic one.</div>
+      </li>
+      <li class="prompt-principle">
+        <span class="principle-num">04</span>
+        <div class="principle-text"><strong>Format-to-UI alignment</strong> — specifying output format to match an existing design template eliminates post-generation editing entirely.</div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Case Study 1 -->
+  <div class="prompt-case reveal">
+    <div class="prompt-case-header">
+      <div class="prompt-case-title">Case 01 — Y.E.E.T. Faction Dialogue: Corporate Voice</div>
+      <div class="prompt-case-label">NASA Studio Project · Spring 2025</div>
+    </div>
+    <div class="prompt-case-body">
+      <div class="prompt-col">
+        <div class="prompt-col-header v1">Version 1 — Weak Prompt</div>
+        <div class="prompt-text-block v1">Write dialogue for a corporate character in a space debris game.</div>
+      </div>
+      <div class="prompt-col">
+        <div class="prompt-col-header v2">Version 3 — Refined Prompt</div>
+        <div class="prompt-text-block v2">You are writing dialogue for AXION Corp's orbital salvage lead in Y.E.E.T., a near-future space governance game. AXION treats debris as a revenue stream, not a hazard. Their language is corporate, optimistic about extraction, and dismissive of regulatory frameworks.
+
+Write 3 lines of in-game dialogue this character would say when defending their right to operate in contested orbital zones. Keep scientific terminology accurate to Low Earth Orbit operations. Each line under 25 words.</div>
+      </div>
+    </div>
+    <div class="prompt-improvements">
+      <span class="prompt-improve-label">Improvements:</span>
+      <span class="improve-tag">Named faction identity</span>
+      <span class="improve-tag">Ideological constraint</span>
+      <span class="improve-tag">Domain accuracy anchor</span>
+      <span class="improve-tag">Format spec: 25 words</span>
+      <span class="improve-tag">Quantity control</span>
+    </div>
+  </div>
+
+  <!-- Case Study 2 -->
+  <div class="prompt-case reveal">
+    <div class="prompt-case-header">
+      <div class="prompt-case-title">Case 02 — Extra Omnes: Post-Labor Vignette</div>
+      <div class="prompt-case-label">Parsons Thesis · Fall 2024</div>
+    </div>
+    <div class="prompt-case-body">
+      <div class="prompt-col">
+        <div class="prompt-col-header v1">Version 1 — Weak Prompt</div>
+        <div class="prompt-text-block v1">Write a story about a future where robots do all the work.</div>
+      </div>
+      <div class="prompt-col">
+        <div class="prompt-col-header v2">Version 3 — Refined Prompt</div>
+        <div class="prompt-text-block v2">Context: This is a vignette for "Extra Omnes," a speculative policy project exploring a post-labor economy (2045–2060). The world operates on a Time-as-Currency exchange system.
+
+Write a 200-word first-person narrative from a former logistics manager (30s, India-born, relocated to Amsterdam) in her first year navigating the Time Currency system. Show the friction of redefining value when identity was built on productive output.
+
+Avoid: dystopian framing, utopian resolution. Tone: unsettled, precise, quietly political. End on ambiguity, not conclusion.</div>
+      </div>
+    </div>
+    <div class="prompt-improvements">
+      <span class="prompt-improve-label">Improvements:</span>
+      <span class="improve-tag">World-state context block</span>
+      <span class="improve-tag">Character specificity</span>
+      <span class="improve-tag">Explicit exclusion criteria</span>
+      <span class="improve-tag">Tone &amp; register spec</span>
+      <span class="improve-tag">Structural end-state control</span>
+    </div>
+  </div>
+
+  <!-- Case Study 3 — Output comparison -->
+  <div class="prompt-case reveal">
+    <div class="prompt-case-header">
+      <div class="prompt-case-title">Case 02 — Output Comparison</div>
+      <div class="prompt-case-label">Why the refined prompt worked</div>
+    </div>
+    <div class="prompt-case-body">
+      <div class="prompt-col">
+        <div class="prompt-col-header output">V1 Output</div>
+        <div class="prompt-text-block output">In the year 2075, robots had taken over every job. Humans were free to do whatever they wanted. Some were happy, but others felt lost without purpose. John, a former factory worker, sat in his apartment wondering what his life meant now...
+
+[Generic narrative. Named male protagonist. Binary emotional arc. Universal moral without nuance.]</div>
+      </div>
+      <div class="prompt-col">
+        <div class="prompt-col-header v2">V3 Output</div>
+        <div class="prompt-text-block v2">The ledger used to make sense. I moved goods. Goods arrived. I was paid. The system had a logic I could trace with my finger.
+
+Now I teach a weekend fermentation workshop. Three people came last month. According to the Time Registry, I earned 6.4 credits — enough for two months of transit and a dentist appointment.
+
+I do not hate this system. I am learning to not understand it as failure.</div>
+      </div>
+    </div>
+    <div class="prompt-improvements" style="background: var(--surface);">
+      <span class="prompt-improve-label" style="color:var(--fg2);">Insight:</span>
+      <span style="font-size:12.5px; color:var(--fg2);">The V3 output required <strong style="color:var(--fg);">minimal editing</strong>. V1 required complete replacement. The work happened in the prompt — not the revision. This is the same principle as annotation guideline design: under-specified instructions produce statistically average outputs.</span>
+    </div>
+  </div>
+
+</section>
+
+<!-- ════════════ EDUCATION ════════════ -->
+<section id="education">
+  <div class="section-eyebrow reveal">
+    <span class="section-eyebrow-num">06</span>
+    <div class="section-eyebrow-line"></div>
+    <span class="section-eyebrow-label">Education</span>
+  </div>
+  <h2 class="section-heading reveal">Academic<br><em>Background</em></h2>
+
+  <div class="edu-list">
+    <div class="edu-item reveal">
+      <div class="edu-year">2026</div>
+      <div>
+        <div class="edu-school">Parsons School of Design, The New School</div>
+        <div class="edu-degree">MS Strategic Design &amp; Management</div>
+        <div class="edu-detail">New York, NY · Focus: Systems thinking, strategic foresight, design for innovation · Minor: Impact Entrepreneurship</div>
+        <div class="edu-badge">⬥ GPA 4.0 / 4.0</div>
+      </div>
+    </div>
+    <div class="edu-item reveal reveal-delay-1">
+      <div class="edu-year">2019</div>
+      <div>
+        <div class="edu-school">Amity University</div>
+        <div class="edu-degree">BA Journalism &amp; Mass Communication</div>
+        <div class="edu-detail">Noida, India · Specialized in storytelling, content strategy, and design communication · Class Representative (3 years)</div>
+      </div>
+    </div>
+    <div class="edu-item reveal reveal-delay-2">
+      <div class="edu-year">2016</div>
+      <div>
+        <div class="edu-school">Cambridge Court High School</div>
+        <div class="edu-degree">CBSE Board — Commerce &amp; English</div>
+        <div class="edu-detail">India · 2014–2016 · Graduated with distinction</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ CONTACT ════════════ -->
+<section id="contact">
+  <div class="section-eyebrow reveal">
+    <span class="section-eyebrow-num">07</span>
+    <div class="section-eyebrow-line"></div>
+    <span class="section-eyebrow-label">Contact</span>
+  </div>
+
+  <h2 class="contact-big reveal">
+    Let's build something<br>
+    <em>precise</em> together.
+  </h2>
+
+  <div class="contact-links reveal reveal-delay-1">
+    <a href="mailto:abhishektewari71@gmail.com" class="contact-link">
+      <span class="contact-link-icon">✉</span>
+      abhishektewari71@gmail.com
+    </a>
+    <a href="tel:+19298420700" class="contact-link">
+      <span class="contact-link-icon">◎</span>
+      +1 (929) 842-0700
+    </a>
+    <a href="https://www.linkedin.com/in/abhishek-tewari/" target="_blank" class="contact-link">
+      <span class="contact-link-icon">in</span>
+      LinkedIn Profile
+    </a>
+    <a href="#" class="contact-link">
+      <span class="contact-link-icon">⊞</span>
+      Notion Portfolio
+    </a>
+  </div>
+
+  <div class="contact-locations reveal reveal-delay-2">
+    <div class="location-item"><div class="location-dot"></div>New York, NY — Based</div>
+    <div class="location-item"><div class="location-dot"></div>Amsterdam — Open</div>
+    <div class="location-item"><div class="location-dot"></div>London — Open</div>
+    <div class="location-item"><div class="location-dot"></div>Remote — Open</div>
+  </div>
+</section>
+
+<!-- ════════════ FOOTER ════════════ -->
+<footer>
+  <span class="footer-copy">© 2025 Abhishek Tewari — AI Prompt Designer &amp; Narrative Systems Thinker</span>
+  <a href="#hero" class="footer-back">↑ Back to top</a>
+</footer>
+
+<!-- ════════════ JS ════════════ -->
+<script>
+// Cursor
+const dot = document.getElementById('cursorDot');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+function animateCursor() {
+  dot.style.left = mx + 'px';
+  dot.style.top  = my + 'px';
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top  = ry + 'px';
+  requestAnimationFrame(animateCursor);
+}
+animateCursor();
+
+// Nav scroll
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// Reveal on scroll
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
