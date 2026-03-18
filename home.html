@@ -1679,7 +1679,8 @@ I do not hate this system. I am learning to not understand it as failure.</div>
 </footer>
 
 <!-- ════════════ JS ════════════ -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<!-- ════════════ JS ════════════ -->
+<script>
 // Cursor
 const dot = document.getElementById('cursorDot');
 const ring = document.getElementById('cursorRing');
@@ -1698,4 +1699,46 @@ animateCursor();
 
 // Nav scroll
 const nav = document.getElementById('mainNav');
-window.addEventListener(
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// Reveal on scroll — with iframe-safe fallback
+function activateReveals() {
+  const reveals = document.querySelectorAll('.reveal');
+
+  // Try IntersectionObserver first
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
+    reveals.forEach(el => observer.observe(el));
+
+    // Fallback: if nothing is visible after 800ms, show everything
+    // (handles iframe environments where IO may not fire correctly)
+    setTimeout(() => {
+      const hidden = document.querySelectorAll('.reveal:not(.visible)');
+      if (hidden.length > reveals.length * 0.5) {
+        hidden.forEach(el => el.classList.add('visible'));
+      }
+    }, 800);
+  } else {
+    // No IO support — just show everything
+    reveals.forEach(el => el.classList.add('visible'));
+  }
+}
+
+// Run on DOM ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', activateReveals);
+} else {
+  activateReveals();
+}
+</script>
+</body>
+</html>
